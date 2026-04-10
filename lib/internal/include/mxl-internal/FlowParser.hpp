@@ -84,6 +84,13 @@ namespace mxl::lib
         [[nodiscard]]
         std::size_t getChannelCount() const;
 
+       /**
+         * Get the interleaving status.
+         * \return Whether or not channels are interleaved.
+         */
+        [[nodiscard]]
+        bool isInterleaved() const;
+
         /**
          * Generic accessor for json fields.
          *

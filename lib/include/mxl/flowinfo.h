@@ -36,6 +36,11 @@ extern "C"
         MXL_PAYLOAD_LOCATION_DEVICE_MEMORY = 1,
     } mxlPayloadLocation;
 
+    typedef enum mxlContinuousFlowFlags
+    {
+       MXL_INTERLEAVED = 1
+    } mxlContinuousFlowFlags;
+
     /**
      * Immutable metadata about a media flow that is independent of the data
      * format of the flow and thus common to all flows handled by MXL.
@@ -123,7 +128,7 @@ extern "C"
     {
         /**
          * The number of channels in this flow.
-         * A dedicated ring buffer is provided for each channel.
+         * In non-interleaved mode, a dedicated ring buffer is provided for each channel.
          */
         uint32_t channelCount;
 
@@ -133,10 +138,15 @@ extern "C"
         uint32_t bufferLength;
 
         /**
+         * Flags. See mxlContinuousFlowFlags.
+         */
+        uint32_t flags;
+
+        /**
          * Reserved space for future extensions, padding the total size of this
          * structure to 64 bytes.
          */
-        uint8_t reserved[56];
+        uint8_t reserved[52];
     } mxlContinuousFlowConfigInfo;
 
     /**

@@ -562,4 +562,17 @@ namespace mxl::lib
         }
         return 1U;
     }
+
+    bool FlowParser::isInterleaved() const
+    {
+        if (auto const it = _root.find("interleaved"); it != _root.end())
+        {
+            if (it->second.is<bool>())
+            {
+                    return it->second.get<bool>();
+            }
+        }
+        return false;
+    }
+
 } // namespace mxl::lib

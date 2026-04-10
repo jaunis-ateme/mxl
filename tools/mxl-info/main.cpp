@@ -121,7 +121,8 @@ namespace
             else if (mxlIsContinuousDataFormat(info.config.common.format))
             {
                 os << '\t' << fmt::format("{: >18}: {}", "Channel count", info.config.continuous.channelCount) << '\n'
-                   << '\t' << fmt::format("{: >18}: {}", "Buffer length", info.config.continuous.bufferLength) << '\n';
+                   << '\t' << fmt::format("{: >18}: {}", "Buffer length", info.config.continuous.bufferLength) << '\n'
+                   << '\t' << fmt::format("{: >18}: {}", "Interleaved", info.config.continuous.flags & MXL_INTERLEAVED) << '\n';
             }
 
             os << '\n'

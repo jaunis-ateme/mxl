@@ -72,6 +72,8 @@ namespace mxl::lib
         std::size_t _channelCount;
         /** Cached copy of the length of the per channel buffers from mxlFlowInfo. */
         std::size_t _bufferLength;
+        /** Cached copy of the interleaving status from mxlFlowInfo. */
+        std::size_t _interleaved;
         /** The currently opened sample range head index. MXL_UNDEFINED_INDEX if no range is currently opened. */
         std::uint64_t _currentIndex;
 

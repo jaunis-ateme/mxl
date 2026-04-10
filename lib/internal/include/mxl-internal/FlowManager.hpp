@@ -87,7 +87,7 @@ namespace mxl::lib
         ///
         std::pair<bool, std::unique_ptr<ContinuousFlowData>> createOrOpenContinuousFlow(uuids::uuid const& flowId, std::string const& flowDef,
             mxlDataFormat flowFormat, mxlRational const& sampleRate, std::size_t channelCount, std::size_t sampleWordSize, std::size_t bufferLength,
-            std::uint32_t maxSyncBatchSizeHintOpt = 1, std::uint32_t maxCommitBatchSizeHintOpt = 1);
+            bool interleaved, std::uint32_t maxSyncBatchSizeHintOpt = 1, std::uint32_t maxCommitBatchSizeHintOpt = 1);
 
         /// Open an existing flow by id.
         ///

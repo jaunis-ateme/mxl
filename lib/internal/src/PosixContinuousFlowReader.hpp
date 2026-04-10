@@ -90,5 +90,7 @@ namespace mxl::lib
         std::size_t _channelCount;
         /** Cached copy of the length of the per channel buffers from mxlFlowInfo. */
         std::size_t _bufferLength;
+        /** Cached copy of the interleaving status from mxlFLowInfo. */
+        bool _interleaved;
     };
 }

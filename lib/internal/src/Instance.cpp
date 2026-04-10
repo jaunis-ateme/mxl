@@ -278,6 +278,7 @@ namespace mxl::lib
             parser.getChannelCount(),
             sampleWordSize,
             pageAlignedLength,
+            parser.isInterleaved(),
             optionsParser.getMaxSyncBatchSizeHint().value_or(batchSizeDefault),
             optionsParser.getMaxCommitBatchSizeHint().value_or(batchSizeDefault));
 

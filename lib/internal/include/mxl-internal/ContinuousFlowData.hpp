@@ -19,6 +19,7 @@ namespace mxl::lib
         constexpr std::size_t channelCount() const noexcept;
         constexpr std::size_t sampleWordSize() const noexcept;
         constexpr std::size_t channelBufferLength() const noexcept;
+        constexpr bool interleaved() const noexcept;
 
         void openChannelBuffers(char const* channelBuffersFilePath, std::size_t sampleWordSize);
 
@@ -62,6 +63,12 @@ namespace mxl::lib
     {
         auto const info = flowInfo();
         return (info != nullptr) ? info->config.continuous.bufferLength : 0U;
+    }
+
+    constexpr bool ContinuousFlowData::interleaved() const noexcept
+    {
+        auto const info = flowInfo();
+        return (info != nullptr) ? info->config.continuous.flags & MXL_INTERLEAVED : false;
     }
 
     constexpr std::size_t ContinuousFlowData::sampleWordSize() const noexcept

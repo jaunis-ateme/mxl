@@ -106,7 +106,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Creat
     try
     {
         auto const sampleRate = mxlRational{48000, 1};
-        auto [flow, created] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 8, sizeof(float), 8192);
+        auto [flow, created] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 8, sizeof(float), 8192, false);
     }
     catch (std::exception const& ex)
     {
@@ -141,7 +141,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Creat
     auto const sampleRate = mxlRational{48000, 1};
 
     auto manager = std::make_shared<FlowManager>(domain);
-    auto [created, flowData] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 2, sizeof(float), 4096);
+    auto [created, flowData] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 2, sizeof(float), 4096, false);
 
     REQUIRE(flowData != nullptr);
     REQUIRE(flowData->isValid());
@@ -150,6 +150,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Creat
     REQUIRE(flowData->channelBufferLength() == 4096U);
     REQUIRE(flowData->channelDataLength() == (flowData->channelCount() * flowData->channelBufferLength()));
     REQUIRE(flowData->channelDataSize() == (flowData->channelDataLength() * flowData->sampleWordSize()));
+    REQUIRE(flowData->interleaved() == false);
 
     auto const flowDirectory = makeFlowDirectoryName(domain, uuids::to_string(flowId));
     REQUIRE(exists(flowDirectory));
@@ -179,7 +180,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Creat
     REQUIRE(!exists(grainDir));
 
     {
-        auto [created, flowData] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 8, sizeof(float), 8192);
+        auto [created, flowData] = manager->createOrOpenContinuousFlow(flowId, flowDef, MXL_DATA_FORMAT_AUDIO, sampleRate, 8, sizeof(float), 8192, false);
         REQUIRE_FALSE(created);
     }
 
@@ -246,7 +247,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Open,
     auto const flowDef2 = mxl::tests::readFile("data/audio_flow.json");
     auto const sampleRate = mxlRational{48000, 1};
     {
-        auto [created, flowData2] = manager->createOrOpenContinuousFlow(flowId2, flowDef2, MXL_DATA_FORMAT_AUDIO, sampleRate, 4, sizeof(float), 2048);
+        auto [created, flowData2] = manager->createOrOpenContinuousFlow(flowId2, flowDef2, MXL_DATA_FORMAT_AUDIO, sampleRate, 4, sizeof(float), 2048, false);
         REQUIRE(flowData2->channelCount() == 4U);
         flowData2.reset();
     }
@@ -319,7 +320,7 @@ TEST_CASE_PERSISTENT_FIXTURE(mxl::tests::mxlDomainFixture, "Flow Manager : Open,
     auto const badId = *uuids::uuid::from_string("44444444-4444-4444-4444-444444444444");
     REQUIRE_THROWS_AS(manager->createOrOpenDiscreteFlow(badId, flowDef1, MXL_DATA_FORMAT_UNSPECIFIED, 1, grainRate, payloadSize, 1, sliceSizes),
         std::runtime_error);
-    REQUIRE_THROWS_AS(manager->createOrOpenContinuousFlow(badId, flowDef2, MXL_DATA_FORMAT_VIDEO, sampleRate, 1, 4, 1024), std::runtime_error);
+    REQUIRE_THROWS_AS(manager->createOrOpenContinuousFlow(badId, flowDef2, MXL_DATA_FORMAT_VIDEO, sampleRate, 1, 4, 1024, false), std::runtime_error);
 }
 
 // Re-creation after deletion

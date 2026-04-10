@@ -13,6 +13,7 @@ namespace mxl::lib
         , _flowData{std::move(data)}
         , _channelCount{_flowData->channelCount()}
         , _bufferLength{_flowData->channelBufferLength()}
+        , _interleaved{_flowData->interleaved()}
         , _currentIndex{MXL_UNDEFINED_INDEX}
         , _syncBatchSize{1U}
         , _earlySyncThreshold{}
@@ -67,14 +68,28 @@ namespace mxl::lib
                 auto const baseBufferPtr = static_cast<std::uint8_t*>(_flowData->channelData());
                 auto const sampleWordSize = _flowData->sampleWordSize();
 
-                payloadBufferSlices.base.fragments[0].pointer = baseBufferPtr + sampleWordSize * startOffset;
-                payloadBufferSlices.base.fragments[0].size = sampleWordSize * firstLength;
+                if (_interleaved)
+                {
+                    payloadBufferSlices.base.fragments[0].pointer = baseBufferPtr + sampleWordSize * _channelCount * startOffset;
+                    payloadBufferSlices.base.fragments[0].size = sampleWordSize * _channelCount * firstLength;
 
-                payloadBufferSlices.base.fragments[1].pointer = baseBufferPtr;
-                payloadBufferSlices.base.fragments[1].size = sampleWordSize * secondLength;
+                    payloadBufferSlices.base.fragments[1].pointer = baseBufferPtr;
+                    payloadBufferSlices.base.fragments[1].size = sampleWordSize * _channelCount * secondLength;
 
-                payloadBufferSlices.stride = sampleWordSize * _bufferLength;
-                payloadBufferSlices.count = _channelCount;
+                    payloadBufferSlices.stride = sampleWordSize * _bufferLength * _channelCount;
+                    payloadBufferSlices.count = 1;
+                }
+                else
+                {
+                    payloadBufferSlices.base.fragments[0].pointer = baseBufferPtr + sampleWordSize * startOffset;
+                    payloadBufferSlices.base.fragments[0].size = sampleWordSize * firstLength;
+
+                    payloadBufferSlices.base.fragments[1].pointer = baseBufferPtr;
+                    payloadBufferSlices.base.fragments[1].size = sampleWordSize * secondLength;
+
+                    payloadBufferSlices.stride = sampleWordSize * _bufferLength;
+                    payloadBufferSlices.count = _channelCount;
+                }
 
                 _currentIndex = index;
 

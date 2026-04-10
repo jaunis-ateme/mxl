@@ -15,6 +15,7 @@ namespace mxl::lib
         , _flowData{std::move(data)}
         , _channelCount{_flowData->channelCount()}
         , _bufferLength{_flowData->channelBufferLength()}
+        , _interleaved{_flowData->interleaved()}
     {}
 
     FlowData const& PosixContinuousFlowReader::getFlowData() const
@@ -127,14 +128,28 @@ namespace mxl::lib
                     auto const baseBufferPtr = static_cast<std::uint8_t const*>(_flowData->channelData());
                     auto const sampleWordSize = _flowData->sampleWordSize();
 
-                    payloadBuffersSlices->base.fragments[0].pointer = baseBufferPtr + sampleWordSize * startOffset;
-                    payloadBuffersSlices->base.fragments[0].size = sampleWordSize * firstLength;
+                    if (_interleaved)
+                    {
+                        payloadBuffersSlices->base.fragments[0].pointer = baseBufferPtr + sampleWordSize * _channelCount * startOffset;
+                        payloadBuffersSlices->base.fragments[0].size = sampleWordSize * _channelCount * firstLength;
 
-                    payloadBuffersSlices->base.fragments[1].pointer = baseBufferPtr;
-                    payloadBuffersSlices->base.fragments[1].size = sampleWordSize * secondLength;
+                        payloadBuffersSlices->base.fragments[1].pointer = baseBufferPtr;
+                        payloadBuffersSlices->base.fragments[1].size = sampleWordSize * _channelCount * secondLength;
 
-                    payloadBuffersSlices->stride = sampleWordSize * _bufferLength;
-                    payloadBuffersSlices->count = _channelCount;
+                        payloadBuffersSlices->stride = sampleWordSize * _bufferLength * _channelCount;
+                        payloadBuffersSlices->count = 1;
+                    }
+                    else
+                    {
+                        payloadBuffersSlices->base.fragments[0].pointer = baseBufferPtr + sampleWordSize * startOffset;
+                        payloadBuffersSlices->base.fragments[0].size = sampleWordSize * firstLength;
+
+                        payloadBuffersSlices->base.fragments[1].pointer = baseBufferPtr;
+                        payloadBuffersSlices->base.fragments[1].size = sampleWordSize * secondLength;
+
+                        payloadBuffersSlices->stride = sampleWordSize * _bufferLength;
+                        payloadBuffersSlices->count = _channelCount;
+                    }
                 }
 
                 return MXL_STATUS_OK;

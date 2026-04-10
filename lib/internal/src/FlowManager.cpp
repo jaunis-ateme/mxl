@@ -255,14 +255,15 @@ namespace mxl::lib
 
     std::pair<bool, std::unique_ptr<ContinuousFlowData>> FlowManager::createOrOpenContinuousFlow(uuids::uuid const& flowId,
         std::string const& flowDef, mxlDataFormat flowFormat, mxlRational const& sampleRate, std::size_t channelCount, std::size_t sampleWordSize,
-        std::size_t bufferLength, std::uint32_t maxSyncBatchSizeHintOpt, std::uint32_t maxCommitBatchSizeHintOpt)
+        std::size_t bufferLength, bool interleaved, std::uint32_t maxSyncBatchSizeHintOpt, std::uint32_t maxCommitBatchSizeHintOpt)
     {
         auto const uuidString = uuids::to_string(flowId);
-        MXL_DEBUG("Create continuous flow. id: {}, channel count: {}, word size: {}, buffer length: {}",
+        MXL_DEBUG("Create continuous flow. id: {}, channel count: {}, word size: {}, buffer length: {}, interleaved: {}",
             uuidString,
             channelCount,
             sampleWordSize,
-            bufferLength);
+            bufferLength,
+            interleaved);
 
         flowFormat = sanitizeFlowFormat(flowFormat);
         if (!mxlIsContinuousDataFormat(flowFormat))
@@ -286,6 +287,7 @@ namespace mxl::lib
             info.config.continuous = {};
             info.config.continuous.channelCount = channelCount;
             info.config.continuous.bufferLength = bufferLength;
+            info.config.continuous.flags |= interleaved ? MXL_INTERLEAVED : 0;
 
             info.runtime = initFlowRuntimeInfo();
 
